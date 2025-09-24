@@ -1,7 +1,9 @@
 //Méndez Galicia Axel Gael
-//Previo 6. Carga de modelos y camara sintetica
-//Fecha de entrega: 16/09/2025
+//Práctica 6. Carga de modelos y camara sintetica
+//Fecha de entrega: 21/09/2025
 //319006160
+
+#include <iostream>
 
 
 // Std. Includes
@@ -102,6 +104,13 @@ int main( )
     // Load models
     Model dog((char*)"Models/RedDog.obj");
     glm::mat4 projection = glm::perspective( camera.GetZoom( ), ( float )SCREEN_WIDTH/( float )SCREEN_HEIGHT, 0.1f, 100.0f );
+
+	Model tree((char*)"D:/Escritorio/Curso_Computacion_Grafica/ConfigInicial/3dModels/Arbol/tree.obj");
+
+	Model trunk((char*)"D:/Escritorio/Curso_Computacion_Grafica/ConfigInicial/3dModels/Tronco/trunk.obj");
+    
+
+    
     
   
 
@@ -132,20 +141,19 @@ int main( )
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
 		dog.Draw(shader);
 
+		//árbol
+        model = glm::mat4(1.0f); // <-- resetea
 		model = glm::translate(model, glm::vec3(3.0f, 0.0f, 0.0f)); 
-		model = glm::scale(model, glm::vec3(2.0f, 2.0f, 2.0f));	
+		model = glm::scale(model, glm::vec3(0.5f, 0.5f, 0.5f));	
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-		dog.Draw(shader);
+		tree.Draw(shader);
 
-        model = glm::translate(model, glm::vec3(5.0f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(5.0f, 5.0f, 5.0f));
+        //tronco
+        model = glm::mat4(1.0f); // <-- resetea
+        model = glm::translate(model, glm::vec3(-5.0f, 0.0f, 0.0f));
+        model = glm::scale(model, glm::vec3(0.1f, 0.1f, 0.1f));
         glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        dog.Draw(shader);
-
-        model = glm::translate(model, glm::vec3(5.1f, 0.0f, 0.0f));
-        model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
-        glUniformMatrix4fv(glGetUniformLocation(shader.Program, "model"), 1, GL_FALSE, glm::value_ptr(model));
-        dog.Draw(shader);
+        tree.Draw(shader);
 
         // Swap the buffers
         glfwSwapBuffers( window );
