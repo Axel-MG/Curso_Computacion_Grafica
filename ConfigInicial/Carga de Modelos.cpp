@@ -1,6 +1,6 @@
 //Méndez Galicia Axel Gael
-//Práctica 6. Carga de modelos y camara sintetica
-//Fecha de entrega: 21/09/2025
+//Previo 7. Texturizado
+//Fecha de entrega: 23/09/2025
 //319006160
 
 #include <iostream>
