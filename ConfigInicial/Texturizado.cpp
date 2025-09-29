@@ -1,6 +1,6 @@
 //Méndez Galicia Axel Gael 
-//Previo 7 Texturizado de Modelos.
-//Fecha de entrega 23/09/2025
+//Práctica 7 Texturizado de Modelos.
+//Fecha de entrega 28/09/2025
 //319006160
 
 #include <iostream>
@@ -61,7 +61,7 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Previo7. Texturizado. Mendez Galicia Axel Gael", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Practica7. Texturizado. Mendez Galicia Axel Gael", nullptr, nullptr);
 
 	if (nullptr == window)
 	{
@@ -102,22 +102,49 @@ int main()
 	Shader lampShader("Shader/lamp.vs", "Shader/lamp.frag");
 
 	// Set up vertex data (and buffer(s)) and attribute pointers
-	GLfloat vertices[] =
-	{
-		// Positions            // Colors              // Texture Coords
-		-0.5f, -0.5f, 0.0f,    1.0f, 1.0f,1.0f,		0.0f,0.0f,
-		0.5f, -0.5f, 0.0f,	   1.0f, 1.0f,1.0f,		1.0f,0.0f,
-		0.5f,  0.5f, 0.0f,     1.0f, 1.0f,1.0f,	    1.0f,2.0f,
-		-0.5f,  0.5f, 0.0f,    1.0f, 1.0f,1.0f,		0.0f,2.0f,
-
-		
+	GLfloat vertices[] = {
+		1.000000f, 1.000000f, -1.000000f,   -0.000000f, 1.000000f, -0.000000f,   0.249480f, 0.000062f,
+		-1.000000f, 1.000000f, -1.000000f,   -0.000000f, 1.000000f, -0.000000f,   0.497422f, 0.000055f,
+		-1.000000f, 1.000000f, 1.000000f,   -0.000000f, 1.000000f, -0.000000f,   0.499019f, 0.246119f,
+		1.000000f, 1.000000f, 1.000000f,   -0.000000f, 1.000000f, -0.000000f,   0.250927f, 0.248007f,
+		1.000000f, -1.000000f, 1.000000f,   -0.000000f, -0.000000f, 1.000000f,   0.250043f, 0.749957f,
+		1.000000f, 1.000000f, 1.000000f,   -0.000000f, -0.000000f, 1.000000f,   0.500000f, 0.749957f,
+		-1.000000f, 1.000000f, 1.000000f,   -0.000000f, -0.000000f, 1.000000f,   0.500000f, 0.999913f,
+		-1.000000f, -1.000000f, 1.000000f,   -0.000000f, -0.000000f, 1.000000f,   0.250043f, 0.999913f,
+		-1.000000f, -1.000000f, 1.000000f,   -1.000000f, -0.000000f, -0.000000f,   0.000005f, -0.000000f,
+		-1.000000f, 1.000000f, 1.000000f,   -1.000000f, -0.000000f, -0.000000f,   0.250955f, 0.000505f,
+		-1.000000f, 1.000000f, -1.000000f,   -1.000000f, -0.000000f, -0.000000f,   0.251001f, 0.247985f,
+		-1.000000f, -1.000000f, -1.000000f,   -1.000000f, -0.000000f, -0.000000f,   0.000001f, 0.248041f,
+		-1.000000f, -1.000000f, -1.000000f,   -0.000000f, -1.000000f, -0.000000f,   0.250182f, 0.498990f,
+		1.000000f, -1.000000f, -1.000000f,   -0.000000f, -1.000000f, -0.000000f,   0.500041f, 0.499666f,
+		1.000000f, -1.000000f, 1.000000f,   -0.000000f, -1.000000f, -0.000000f,   0.499853f, 0.753694f,
+		-1.000000f, -1.000000f, 1.000000f,   -0.000000f, -1.000000f, -0.000000f,   0.249942f, 0.753755f,
+		1.000000f, -1.000000f, -1.000000f,   1.000000f, -0.000000f, -0.000000f,   0.498369f, 0.000189f,
+		1.000000f, 1.000000f, -1.000000f,   1.000000f, -0.000000f, -0.000000f,   0.749018f, 0.000031f,
+		1.000000f, 1.000000f, 1.000000f,   1.000000f, -0.000000f, -0.000000f,   0.749024f, 0.246085f,
+		1.000000f, -1.000000f, 1.000000f,   1.000000f, -0.000000f, -0.000000f,   0.499042f, 0.246076f,
+		-1.000000f, -1.000000f, -1.000000f,   -0.000000f, -0.000000f, -1.000000f,   0.250043f, 0.250043f,
+		-1.000000f, 1.000000f, -1.000000f,   -0.000000f, -0.000000f, -1.000000f,   0.500000f, 0.250043f,
+		1.000000f, 1.000000f, -1.000000f,   -0.000000f, -0.000000f, -1.000000f,   0.500000f, 0.500000f,
+		1.000000f, -1.000000f, -1.000000f,   -0.000000f, -0.000000f, -1.000000f,   0.250043f, 0.500000f,
 	};
 
-	GLuint indices[] =
-	{  // Note that we start from 0!
-		0,1,3,
-		1,2,3
-	
+	GLuint indices[] = {
+		0, 1, 2,
+		0, 2, 3,
+		4, 5, 6,
+
+		4, 6, 7,
+		8, 9, 10,
+		8, 10, 11,
+
+		12, 13, 14,
+		12, 14, 15,
+		16, 17, 18,
+
+		16, 18, 19,
+		20, 21, 22,
+		20, 22, 23,
 	};
 
 	// First, set the container's VAO (and VBO)
@@ -156,13 +183,15 @@ int main()
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST_MIPMAP_NEAREST);
 	// Diffuse map
-	image = stbi_load("images/van4.png", &textureWidth, &textureHeight, &nrChannels,0);
+	image = stbi_load("Cubo/dietexture.png", &textureWidth, &textureHeight, &nrChannels,0);
 	glBindTexture(GL_TEXTURE_2D, texture1);
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+	GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+	glTexImage2D(GL_TEXTURE_2D, 0, format, textureWidth, textureHeight, 0, format, GL_UNSIGNED_BYTE, image);
 	glGenerateMipmap(GL_TEXTURE_2D);
 	if (image)
 	{
-		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureWidth, textureHeight, 0, GL_RGB, GL_UNSIGNED_BYTE, image);
+		GLenum format = (nrChannels == 4) ? GL_RGBA : GL_RGB;
+		glTexImage2D(GL_TEXTURE_2D, 0, format, textureWidth, textureHeight, 0, format, GL_UNSIGNED_BYTE, image);
 		glGenerateMipmap(GL_TEXTURE_2D);
 	}
 	else
@@ -211,7 +240,7 @@ int main()
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		// Draw the light object (using light's vertex attributes)
 		glBindVertexArray(VAO);
-		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
+		glDrawElements(GL_TRIANGLES, 36, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 
 		// Swap the screen buffers
