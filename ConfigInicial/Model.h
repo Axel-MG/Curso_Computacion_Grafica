@@ -45,6 +45,8 @@ private:
 	/*  Model Data  */
 	vector<Mesh> meshes;
 	string directory;
+
+public:
 	vector<Texture> textures_loaded;	// Stores all the textures loaded so far, optimization to make sure textures aren't loaded more than once.
 
 										/*  Functions   */
