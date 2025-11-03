@@ -1,6 +1,6 @@
-﻿//Previo 11. Animación por máquina de estados.
+﻿//Práctica 11. Animación por máquina de estados.
 //Méndez Galicia Axel Gael
-//Fecha de entrega: 28/10/2025
+//Fecha de entrega: 02/11/2025
 //319006160
 
 #include <iostream>
@@ -117,6 +117,14 @@ float tail = 0.0f;
 glm::vec3 dogPos (0.0f,0.0f,0.0f);
 float dogRot = 0.0f;
 bool step = false;
+//Extras 
+bool turning = false;
+float targetRot = 0.0f;
+int turnCount = 0;
+bool returningCenter = false;
+bool centerTurned = false;   // para evitar que gire más de una vez en el centro
+// animaciones durante la vuelta
+float turnTilt = 0.0f;   // inclinación del cuerpo al girar
 
 
 
@@ -136,7 +144,7 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Previo 11. Animacion maquina de estados. Mendez Galicia Axel Gael", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Practica 11. Animacion maquina de estados. Mendez Galicia Axel Gael", nullptr, nullptr);
 
 	if (nullptr == window)
 	{
@@ -313,6 +321,9 @@ int main()
 		//Body
 		modelTemp= model = glm::translate(model, dogPos);
 		modelTemp= model = glm::rotate(model, glm::radians(dogRot), glm::vec3(0.0f, 1.0f, 0.0f));
+		//Agregado
+		modelTemp = model = glm::rotate(model, glm::radians(turnTilt), glm::vec3(0.0f, 0.0f, 1.0f));
+		//
 		glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 		DogBody.Draw(lightingShader);
 		//Head
@@ -544,14 +555,125 @@ void Animation() {
 			}
 		}
 
-		// --- Límite de avance ---
-		if (dogPos.z < 2.34f) {  // ← ajusta este número según el tamaño del piso
-			dogPos.z += 0.0001;  // avanza
+		//Nueva lógica de movimiento con máquina de estados
+		float limitZ = 2.34f;
+		float limitX = 2.34f;
+		float speed = 0.001f;
+		float rotSpeed = 1.0f;
+
+		float dx = -dogPos.x;
+		float dz = -dogPos.z;
+		float distanceToCenter = sqrt(dx * dx + dz * dz);
+
+		float angleToCenter = atan2(dx, dz) * 180.0f / 3.14159265f;
+		float centerThreshold = 0.05f;
+
+		if (!turning)
+		{
+			//----------------------------------
+			//  MOVIMIENTO NORMAL
+			//----------------------------------
+			if (!returningCenter)
+			{
+				dogPos.x += speed * sin(glm::radians(dogRot));
+				dogPos.z += speed * cos(glm::radians(dogRot));
+
+				if (dogRot == 0.0f && dogPos.z >= limitZ) {
+					turning = true; turnCount++;
+					if (turnCount == 3) returningCenter = true;
+					targetRot = dogRot + ((returningCenter) ? 135.0f : 90.0f);
+				}
+				else if (dogRot == 90.0f && dogPos.x >= limitX) {
+					turning = true; turnCount++;
+					if (turnCount == 3) returningCenter = true;
+					targetRot = dogRot + ((returningCenter) ? 135.0f : 90.0f);
+				}
+				else if (dogRot == 180.0f && dogPos.z <= -limitZ) {
+					turning = true; turnCount++;
+					if (turnCount == 3) returningCenter = true;
+					targetRot = dogRot + ((returningCenter) ? 135.0f : 90.0f);
+				}
+				else if (dogRot >= 260.0f && dogRot <= 280.0f && dogPos.x <= -limitX)
+				{
+					// Asegura borde exacto antes de girar
+					dogRot = 270.0f;
+					dogPos.x = -limitX;
+					turning = true;
+					turnCount++;
+
+					if (turnCount == 3) {
+						returningCenter = true;
+						targetRot = dogRot + 135.0f; // giro especial hacia centro
+					}
+					else {
+						targetRot = dogRot + 90.0f;
+					}
+				}
+			}
+			//----------------------------------
+			//  REGRESO AL CENTRO
+			//----------------------------------
+			else
+			{
+				if (fabs(angleToCenter - dogRot) > 2.0f && !centerTurned)
+				{
+					turning = true;
+					targetRot = angleToCenter;
+				}
+				else
+				{
+					dogPos.x += speed * sin(glm::radians(dogRot));
+					dogPos.z += speed * cos(glm::radians(dogRot));
+
+					if (distanceToCenter <= centerThreshold && !centerTurned)
+					{
+						turning = true;
+						targetRot = dogRot + 45.0f;
+						centerTurned = true;
+					}
+				}
+			}
 		}
-		else {
-			dogAnim = 0;         // detiene animación al llegar al borde
-			// opcional: puedes dejar que las patas sigan moviéndose sin avanzar si lo prefieres
+		else
+		{
+			//----------------------------------
+			//  GIRO SUAVE con control estable
+			//----------------------------------
+			float current = fmod((dogRot + 360.0f), 360.0f);
+			float target = fmod((targetRot + 360.0f), 360.0f);
+
+			float diff = target - current;
+			if (diff > 180.0f)  diff -= 360.0f;
+			if (diff < -180.0f) diff += 360.0f;
+
+			// Evita quedarse atascado si el giro es pequeño
+			if (fabs(diff) > 0.5f)
+			{
+				float direction = (diff > 0) ? 1.0f : -1.0f;
+				dogRot = fmod((dogRot + direction * rotSpeed + 360.0f), 360.0f);
+			}
+			else
+			{
+				// Giro completado
+				dogRot = fmod(targetRot, 360.0f);
+				turning = false;
+
+				if (centerTurned)
+				{
+					dogPos = glm::vec3(0.0f, 0.0f, 0.0f);
+					dogRot = 0.0f;
+					returningCenter = false;
+					centerTurned = false;
+					turnCount = 0;
+				}
+			}
 		}
+
+
+
+
+
+
 	}
 	
 	
