@@ -1,8 +1,9 @@
-//Previo 12. Animacion por KeyFrames.
-//M�ndez Galicia Axel Gael
+﻿//Práctica 12. Animacion por KeyFrames.
+//Méndez Galicia Axel Gael
 //319006160
-//Fecha de entrega: 04/11/2025
+//Fecha de entrega: 09/11/2025
 
+#define _CRT_SECURE_NO_WARNINGS
 #include <iostream>
 #include <cmath>
 
@@ -122,7 +123,7 @@ float RLegR = 0.0f;
 //KeyFrames
 float dogPosX , dogPosY , dogPosZ  ;
 
-#define MAX_FRAMES 9
+#define MAX_FRAMES 30
 int i_max_steps = 1000;
 int i_curr_steps = 0;
 typedef struct _frame {
@@ -137,7 +138,7 @@ typedef struct _frame {
 	float incZ;
 	float head;
 	float headInc;
-	//Todas las dem�s partes del perro
+	//Todas las demás partes del perro
 	float tail;
 	float tailInc;
 	float FLegL;
@@ -211,6 +212,78 @@ void interpolation(void)
 
 }
 
+// Guarda todos los datos de animación en un archivo de texto
+void saveAnimationToFile(const char* filename) {
+	FILE* file = fopen(filename, "w");
+	if (!file) {
+		printf("Error al abrir el archivo para guardar.\n");
+		return;
+	}
+
+	fprintf(file, "%d\n", FrameIndex); // número de keyframes
+
+	for (int i = 0; i < FrameIndex; i++) {
+		fprintf(file,
+			"%f %f %f "
+			"%f %f "
+			"%f %f %f %f "
+			"%f "
+			"%f %f %f "
+			"%f %f "
+			"%f %f %f %f "
+			"%f\n",
+
+			KeyFrame[i].dogPosX, KeyFrame[i].dogPosY, KeyFrame[i].dogPosZ,
+			KeyFrame[i].head, KeyFrame[i].tail,
+			KeyFrame[i].FLegL, KeyFrame[i].FLegR, KeyFrame[i].RLegL, KeyFrame[i].RLegR,
+			KeyFrame[i].rotDog,
+			KeyFrame[i].incX, KeyFrame[i].incY, KeyFrame[i].incZ,
+			KeyFrame[i].headInc, KeyFrame[i].tailInc,
+			KeyFrame[i].FLegLInc, KeyFrame[i].FLegRInc, KeyFrame[i].RLegLInc, KeyFrame[i].RLegRInc,
+			KeyFrame[i].rotDogInc
+		);
+	}
+
+	fclose(file);
+	printf("Animación guardada correctamente en %s\n", filename);
+}
+
+
+// Carga todos los datos de animación desde un archivo de texto
+void loadAnimationFromFile(const char* filename) {
+	FILE* file = fopen(filename, "r");
+	if (!file) {
+		printf("No se encontró archivo de animación (%s).\n", filename);
+		return;
+	}
+
+	fscanf(file, "%d", &FrameIndex);
+
+	for (int i = 0; i < FrameIndex; i++) {
+		fscanf(file,
+			"%f %f %f "
+			"%f %f "
+			"%f %f %f %f "
+			"%f "
+			"%f %f %f "
+			"%f %f "
+			"%f %f %f %f "
+			"%f",
+
+			&KeyFrame[i].dogPosX, &KeyFrame[i].dogPosY, &KeyFrame[i].dogPosZ,
+			&KeyFrame[i].head, &KeyFrame[i].tail,
+			&KeyFrame[i].FLegL, &KeyFrame[i].FLegR, &KeyFrame[i].RLegL, &KeyFrame[i].RLegR,
+			&KeyFrame[i].rotDog,
+			&KeyFrame[i].incX, &KeyFrame[i].incY, &KeyFrame[i].incZ,
+			&KeyFrame[i].headInc, &KeyFrame[i].tailInc,
+			&KeyFrame[i].FLegLInc, &KeyFrame[i].FLegRInc, &KeyFrame[i].RLegLInc, &KeyFrame[i].RLegRInc,
+			&KeyFrame[i].rotDogInc
+		);
+	}
+
+	fclose(file);
+	printf("Animación cargada correctamente desde %s\n", filename);
+}
 
 
 // Deltatime
@@ -219,6 +292,7 @@ GLfloat lastFrame = 0.0f;  	// Time of last frame
 
 int main()
 {
+	loadAnimationFromFile("animacion_perro.txt");
 	// Init GLFW
 	glfwInit();
 	// Set all the required options for GLFW
@@ -229,7 +303,7 @@ int main()
 	glfwWindowHint(GLFW_RESIZABLE, GL_FALSE);*/
 
 	// Create a GLFWwindow object that we can use for GLFW's functions
-	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Previo 12. Animacion por Keyframes. Mendez Galicia Axel Gael", nullptr, nullptr);
+	GLFWwindow* window = glfwCreateWindow(WIDTH, HEIGHT, "Practica 12. Animacion por Keyframes. Mendez Galicia Axel Gael", nullptr, nullptr);
 
 	if (nullptr == window)
 	{
@@ -533,6 +607,11 @@ int main()
 // Moves/alters the camera positions based on user input
 void DoMovement()
 {
+	////Animación guardada
+	//if (keys[GLFW_KEY_P]) {
+	//	saveAnimationToFile("animacion_perro.txt");
+	//}
+
 	//Dog Controls
 	//Pierna Frontal Izquierda
 	if (keys[GLFW_KEY_8])
@@ -715,6 +794,7 @@ void DoMovement()
 void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode)
 {
 
+
 	if (keys[GLFW_KEY_L])
 	{
 		if (play == false && (FrameIndex > 1))
@@ -735,7 +815,7 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 
 	}
 
-	if (keys[GLFW_KEY_K])
+	if (key == GLFW_KEY_K && action == GLFW_PRESS)
 	{
 		if (FrameIndex < MAX_FRAMES)
 		{
@@ -744,7 +824,27 @@ void KeyCallback(GLFWwindow *window, int key, int scancode, int action, int mode
 
 	}
 
+	// Guardar animación completa con Z 
+	if (key == GLFW_KEY_Z && action == GLFW_PRESS)
+	{
+		saveAnimationToFile("animacion_perro.txt");
+	}
 
+	// Cargar animación guardada con P
+	if (key == GLFW_KEY_P && action == GLFW_PRESS)
+	{
+		loadAnimationFromFile("animacion_perro.txt");
+		resetElements();
+		play = false;
+		printf("Animación lista para reproducirse. Presiona L.\n");
+	}
+	
+	// Reset de frames con X
+	if (key == GLFW_KEY_X && action == GLFW_PRESS) {
+		FrameIndex = 0;
+		memset(KeyFrame, 0, sizeof(KeyFrame));
+		printf("Animación nueva: FrameIndex=0\n");
+	}
 
 	if (GLFW_KEY_ESCAPE == key && GLFW_PRESS == action)
 	{
